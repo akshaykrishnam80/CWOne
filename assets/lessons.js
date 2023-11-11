@@ -4,7 +4,7 @@ const Lessons = [
         "LessonImg": "assets/img/science.png",
         "LessonName": "Physics Fundamentals",
         "LessonLocation": "Oxford",
-        "LessonSpace": 8,
+        "LessonSpace": 18,
         "LessonPrice": 99,
     },
     {

@@ -1,11 +1,9 @@
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/bootstrap.min.css">
     <link rel="stylesheet" href="assets/style.css">
-
 
     <title>CST3145 Coursework 1 <br> VueJS Web Application</title>
 
@@ -16,6 +14,7 @@
 
 <body>
     <div id="WebApp">
+        <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg bg-light">
             <div class="container">
                 <a class="navbar-brand text-success" href="index.html">{{ title }}</a>
@@ -30,9 +29,9 @@
                             <a class="nav-link active" aria-current="page" href="index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <button @click="toggleCart" class="btn btn-success" :disabled="cart.length === 0">Cart</button></a>
+                            <button @click="toggleCart" class="btn btn-success"
+                                :disabled="cart.length === 0">Cart</button>
                         </li>
-                        
                     </ul>
                     <form class="d-flex" role="search">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -42,15 +41,10 @@
             </div>
         </nav>
 
-
-
         <div class="container">
-            
             <div class="lessons" v-if="showCart">
                 <br>
-                <h3 >Lessons List</h3>
-
-                                
+                <h3>Lessons List</h3>
                 <div>
                     <label>Sort:</label>
                     <select v-model="sortCriteria">
@@ -65,48 +59,67 @@
                     </select>
                 </div>
 
+                <!-- Display lessons -->
                 <div class="row">
-                    <div class="col-md-3 mt-3" v-for="lesson in sortedLessons" :key="lesson.id">
-                        <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
-                        <p>
-                            {{ lesson.LessonName }} <br>
-                            <b>Price:</b> £{{ lesson.LessonPrice }} <br>
-                            <b>Space:</b> {{ lesson.LessonSpace }}
-                            <button @click="addToCart(lesson)" :disabled="lesson.LessonSpace === 0" class="btn btn-success">Add to Cart</button>
-                            
-                        </p>
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 mt-3" v-for="lesson in sortedLessons" :key="lesson.id">
+                        <div class="lessons-box">
+                            <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
+                            <p>
+                                
+                                <b style="font-size: 18px;">{{ lesson.LessonName }}</b> <br>
+                                <b>Price: £{{ lesson.LessonPrice }}</b><br>
+                                
+                                <!-- Check if LessonSpace is greater than 0 -->
+                                <div class="clearfix" style="margin-top: -15px;"></div>  
+                                <span v-if="lesson.LessonSpace > 0">
+                                    <p style="margin: 0 0 5px 0;"><b>Space: {{ lesson.LessonSpace }} {{ lesson.LessonSpace <= 5 ? 'left' : '' }}</b></p>
+                                    <div class="clearfix"></div>    
+                                    <button @click="addToCart(lesson)" class="btn btn-success">Add to Cart</button> 
+                                    
+                                </span>
+                                
+                                <span v-else>  
+                                    <b>Out of Stock</b> 
+                                    <div class="clearfix"></div>  <br>
+                                    <button :disabled="true" class="btn btn-secondary">Add to Cart</button> 
+                                </span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Shopping Cart section -->
             <div class="cart" v-else>
                 <br>
                 <h3>Shopping Cart</h3>
+                
                 <ul>
                     <li v-for="item in cart" :key="item.id">
                         {{ item.LessonName }} <br> £{{ item.LessonPrice }} <br>
-                        Quantity: {{ item.quantity }}
+                        Quantity: {{ item.LessonSpace }}
+                        
+                        <button @click="decrementQty(item)" class="btn btn-secondary">-</button>
+                        <button @click="incrementQty(item)" class="btn btn-secondary">+</button>
                         <button @click="removeFromCart(item)" class="btn btn-danger">Remove</button>
                     </li>
                 </ul>
 
+                
                 <p>Total: £{{ total }}</p>
-
                 <label for="username">Username:</label>
                 <input type="text" id="username" v-model="username">
                 <label for="contact">Contact:</label>
                 <input type="text" id="contact" v-model="contact">
 
-
+                
                 <p>Order Details:</p>
                 Username: <b>{{ username }}</b><br>
                 Phone: <b>{{ contact }}</b><br>
                 Total Items in cart: <b> {{ totalItemsInCart }}</b><br>
-                Total Amount: <b>£{{ total }}</b> 
+                Total Amount: <b>£{{ total }}</b>
             </div>
         </div>
-
-
-
     </div>
 
 
@@ -125,38 +138,89 @@
                 sortOrder: 'asc'
             },
             methods: {
+                  // add lesson 
                 addToCart(lesson) {
                     const existingIndex = this.cart.findIndex(item => item.id === lesson.id);
 
                     if (lesson.LessonSpace > 0) {
+                          // check lesson already cart, 
                         if (existingIndex !== -1) {
-                            this.cart[existingIndex].quantity++;
+                              // increase LessonSpace;
+                            this.cart[existingIndex].LessonSpace++;
                         } else {
-                            this.cart.push({ id: lesson.id, LessonName: lesson.LessonName, LessonPrice: lesson.LessonPrice, quantity: 1 });
+                              // add to cart
+                            this.cart.push({
+                                id: lesson.id,
+                                LessonName: lesson.LessonName,
+                                LessonPrice: lesson.LessonPrice,
+                                LessonSpace: 1,
+                            });
                         }
 
-                        this.lessons.find(item => item.id === lesson.id).LessonSpace--;
+                          // decrease LessonSpace lesson
+                        lesson.LessonSpace--;
 
+                          // total amount of cart
                         this.calculateTotal();
                     }
                 },
+                  // remove lesson
                 removeFromCart(item) {
                     const existingIndex = this.cart.findIndex(cartItem => cartItem.id === item.id);
 
                     if (existingIndex !== -1) {
+                          // Remove item cart
                         this.cart.splice(existingIndex, 1);
-                        this.lessons.find(lesson => lesson.id === item.id).LessonSpace += item.quantity;
+                          // reverting LessonSpace
+                        this.lessons.find(lesson => lesson.id === item.id).LessonSpace += item.LessonSpace;
+
+                          // total amount updates
                         this.calculateTotal();
                     }
                 },
+                  // increase spaces in cart
+                incrementQty(item) {
+                    const lesson = this.lessons.find(lesson => lesson.id === item.id);
+
+                    if (lesson) {
+                          // increase and decrease lessons
+                        item.LessonSpace++;
+                        lesson.LessonSpace--;
+
+                          // Reverting if LessonSpace becomes deduction
+                        if (lesson.LessonSpace < 0) {
+                            item.LessonSpace--;
+                            lesson.LessonSpace++;
+                        }
+
+                          // Recalculate the total amount in cart
+                        this.calculateTotal();
+                    }
+                },
+                  // decrease spaces in cart
+                decrementQty(item) {
+                    const lesson = this.lessons.find(lesson => lesson.id === item.id);
+
+                    if (lesson && item.LessonSpace > 1) {
+                          // decrease and increase lesson spaces
+                        item.LessonSpace--;
+                        lesson.LessonSpace++;
+
+                          // Recalculate the total amount in cart
+                        this.calculateTotal();
+                    }
+                },
+                  // total amount in cart
                 calculateTotal() {
                     this.total = this.cart.reduce((acc, item) => acc + item.LessonPrice, 0);
                 },
+                  // toggle Lessons and Cart 
                 toggleCart() {
                     if (this.cart.length > 0) {
-                        this.showCart = this.showCart === false;
+                        this.showCart = !this.showCart;
                     }
                 },
+                  // Sorting
                 sortItems(items) {
                     const key = this.sortCriteria;
                     const order = this.sortOrder === 'asc' ? 1 : -1;
@@ -172,9 +236,11 @@
                 }
             },
             computed: {
+                  // total number items cart
                 totalItemsInCart() {
                     return this.cart.length;
                 },
+                  // sorted lessons criteria and order
                 sortedLessons() {
                     return this.sortItems(this.lessons);
                 }
