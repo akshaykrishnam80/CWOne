@@ -8,12 +8,13 @@
     
     <title>CST3145 Coursework 1 - VueJS Web Application</title>
     <script src="assets/vue.js"></script>
+    <script src="assets/lessons.js"></script>
 </head>
 <body>
     <div id="WebApp">
     <nav class="navbar navbar-expand-lg bg-light">
         <div class="container">
-          <a class="navbar-brand" href="index.html">Vue Web Based Mobile App</a>
+          <a class="navbar-brand" href="index.html">{{ title }}</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -40,10 +41,9 @@
     var WebApp = new Vue({
         el: '#WebApp',
         data: {
-            title: 'Vue App',
-            lessons: [],
+            title: 'Vue Web Based Mobile App',
+            lessons: Lessons,
             cart: []
-            
         }
     });
     </script>
