@@ -1,81 +1,119 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/bootstrap.min.css">
     <link rel="stylesheet" href="assets/style.css">
-    
-    
-    <title>CST3145 Coursework 1 - VueJS Web Application</title>
+
+
+    <title>CST3145 Coursework 1 <br> VueJS Web Application</title>
 
     <script src="assets/bootstrap.bundle.min.js"></script>
     <script src="assets/vue.js"></script>
     <script src="assets/lessons.js"></script>
 </head>
+
 <body>
     <div id="WebApp">
-    <nav class="navbar navbar-expand-lg bg-light">
+        <nav class="navbar navbar-expand-lg bg-light">
+            <div class="container">
+                <a class="navbar-brand text-success" href="index.html">{{ title }}</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <button @click="toggleCart" class="btn btn-success" :disabled="cart.length === 0">Cart</button></a>
+                        </li>
+                        
+                    </ul>
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+
+
+
         <div class="container">
-          <a class="navbar-brand" href="index.html">{{ title }}</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-              </li>
-            </ul>
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-          </div>
-        </div>
-      </nav>
-
-      
-      <div class="container">
-        <h3>Lessons</h3>
-
-        <div v-for="lesson in lessons" :key="lesson.id">
-            <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
-            <p>{{ lesson.LessonName }} - £{{ lesson.LessonPrice }} - {{ lesson.LessonSpace }} - {{ lesson.LessonPrice }} - {{ lesson.LessonLocation }}</p>
-            <button @click="addToCart(lesson)">Add to Cart</button>
             
+            <div class="lessons" v-if="showCart">
+                <br>
+                <h3 >Lessons List</h3>
+
+                <div class="row">
+                    <div class="col-md-3 mt-3" v-for="lesson in lessons" :key="lesson.id">
+                        <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
+                        <p>{{ lesson.LessonName }} <br> <b>Price:</b> £{{ lesson.LessonPrice }} <br> <b>Space:</b> {{ lesson.LessonSpace }} <br> <b>Location:</b> {{ lesson.LessonLocation }}</p>
+                        <button @click="addToCart(lesson)" class="btn btn-success">Add to Cart</button>
+
+                    </div>
+                </div>
+            </div>
+            <div class="cart" v-else>
+                <br>
+                <h3>Shopping Cart</h3>
+                <ul>
+                    <li v-for="item in cart" :key="item.id">
+                        {{ item.LessonName }} <br> £{{ item.LessonPrice }}
+                    </li>
+                </ul>
+
+                <p>Total: £{{ total }}</p>
+
+
+                <h2>User Information</h2>
+                <p>Username: {{ username }}</p>
+                <p>Phone: {{ phone }}</p>
+
+
+            </div>
         </div>
 
-        <h2>Shopping Cart</h2>
-        <ul>
-            <li v-for="item in cart" :key="item.id">
-            {{ item.LessonName }} - £{{ item.LessonPrice }}
-            </li>
-        </ul>
 
-        <p>Total: £{{ total }}</p>
-      </div>
+
     </div>
-      
-      
+
+
     <script>
-    var WebApp = new Vue({
-        el: '#WebApp',
-        data: {
-            title: 'Vue Web Based Mobile App',
-            lessons: Lessons,
-            cart: [],
-            total: 0,
-        },
-        methods: {
-            addToCart(lesson) {
-                this.cart.push(lesson);
-                this.calculateTotal();
+        var WebApp = new Vue({
+            el: '#WebApp',
+            data: {
+                title: 'Vue Web Based Mobile App',
+                lessons: Lessons,
+                cart: [],
+                total: 0,
+                showCart: true,
+                order_details: [
+                    { username: '', phone: '' }
+                ]
             },
-            calculateTotal() {
-                this.total = this.cart.reduce((acc, item) => acc + item.LessonPrice, 0);
-            }
-        },
-    });
+            methods: {
+                addToCart(lesson) {
+                    this.cart.push(lesson);
+                    this.calculateTotal();
+                },
+                calculateTotal() {
+                    this.total = this.cart.reduce((acc, item) => acc + item.LessonPrice, 0);
+                },
+                toggleCart() {
+                    
+                    if (this.cart.length > 0) {
+                        this.showCart = this.showCart === false;
+                    }
+                }
+            },
+        });
     </script>
 </body>
+
 </html>
