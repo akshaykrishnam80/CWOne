@@ -50,12 +50,26 @@
                 <br>
                 <h3 >Lessons List</h3>
 
+                                
+                <div>
+                    <label>Sort:</label>
+                    <select v-model="sortCriteria">
+                        <option value="name">Name</option>
+                        <option value="price">Price</option>
+                        <option value="location">Location</option>
+                        <option value="spaces">Spaces Available</option>
+                    </select>
+                    <select v-model="sortOrder">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+
                 <div class="row">
-                    <div class="col-md-3 mt-3" v-for="lesson in lessons" :key="lesson.id">
+                    <div class="col-md-3 mt-3" v-for="lesson in sortedLessons" :key="lesson.id">
                         <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
                         <p>{{ lesson.LessonName }} <br> <b>Price:</b> £{{ lesson.LessonPrice }} <br> <b>Space:</b> {{ lesson.LessonSpace }} <br> <b>Location:</b> {{ lesson.LessonLocation }}</p>
                         <button @click="addToCart(lesson)" class="btn btn-success">Add to Cart</button>
-
                     </div>
                 </div>
             </div>
@@ -100,11 +114,8 @@
                 showCart: true,
                 username: '',
                 contact: '',
-            },
-            computed: {
-            totalItemsInCart() {
-                return this.cart.length;
-            }
+                sortCriteria: 'name',
+                sortOrder: 'asc'
             },
             methods: {
                 addToCart(lesson) {
@@ -118,8 +129,29 @@
                     if (this.cart.length > 0) {
                         this.showCart = this.showCart === false;
                     }
+                },
+                sortItems(items) {
+                    const key = this.sortCriteria;
+                    const order = this.sortOrder === 'asc' ? 1 : -1;
+
+                    return items.slice().sort((a, b) => {
+                        const valueA = key === 'name' ? a.LessonName : key === 'price' ? a.LessonPrice : key === 'location' ? a.LessonLocation : a.LessonSpace;
+                        const valueB = key === 'name' ? b.LessonName : key === 'price' ? b.LessonPrice : key === 'location' ? b.LessonLocation : b.LessonSpace;
+
+                        if (valueA < valueB) return -1 * order;
+                        if (valueA > valueB) return 1 * order;
+                        return 0;
+                    });
                 }
             },
+            computed: {
+                totalItemsInCart() {
+                    return this.cart.length;
+                },
+                sortedLessons() {
+                    return this.sortItems(this.lessons);
+                }
+            }
         });
     </script>
 </body>
