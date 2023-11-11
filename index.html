@@ -70,12 +70,17 @@
 
                 <p>Total: £{{ total }}</p>
 
+                <label for="username">Username:</label>
+                <input type="text" id="username" v-model="username">
+                <label for="contact">Contact:</label>
+                <input type="text" id="contact" v-model="contact">
 
-                <h2>User Information</h2>
-                <p>Username: {{ username }}</p>
-                <p>Phone: {{ phone }}</p>
 
-
+                <p>Order Details:</p>
+                Username: <b>{{ username }}</b><br>
+                Phone: <b>{{ contact }}</b><br>
+                Total Items in cart: <b> {{ totalItemsInCart }}</b><br>
+                Total Amount: <b>£{{ total }}</b> 
             </div>
         </div>
 
@@ -93,9 +98,13 @@
                 cart: [],
                 total: 0,
                 showCart: true,
-                order_details: [
-                    { username: '', phone: '' }
-                ]
+                username: '',
+                contact: '',
+            },
+            computed: {
+            totalItemsInCart() {
+                return this.cart.length;
+            }
             },
             methods: {
                 addToCart(lesson) {
@@ -106,7 +115,6 @@
                     this.total = this.cart.reduce((acc, item) => acc + item.LessonPrice, 0);
                 },
                 toggleCart() {
-                    
                     if (this.cart.length > 0) {
                         this.showCart = this.showCart === false;
                     }
