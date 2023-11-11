@@ -34,7 +34,7 @@
                         </li>
                     </ul>
                     <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" v-model="searchQuery" @input="searchLessons">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
@@ -140,7 +140,8 @@
                 username: '',
                 contact: '',
                 sortCriteria: 'name',
-                sortOrder: 'asc'
+                sortOrder: 'asc',
+                searchQuery: '',
             },
             methods: {
                   // add lesson 
@@ -238,17 +239,30 @@
                         if (valueA > valueB) return 1 * order;
                         return 0;
                     });
-                }
+                },
+                searchLessons() {
+                    const query = this.searchQuery.toLowerCase();
+                    this.sortedLessons = this.lessons.filter(lesson =>
+                        lesson.LessonName.toLowerCase().includes(query) ||
+                        lesson.LessonLocation.toLowerCase().includes(query)
+                    );
+                },
             },
             computed: {
                   // total number items cart
                 totalItemsInCart() {
                     return this.cart.length;
                 },
-                  // sorted lessons criteria and order
                 sortedLessons() {
-                    return this.sortItems(this.lessons);
-                }
+                    return this.sortItems(this.filteredLessons);
+                },
+                filteredLessons() {
+                    const query = this.searchQuery.toLowerCase();
+                    return this.lessons.filter(lesson =>
+                        lesson.LessonName.toLowerCase().includes(query) ||
+                        lesson.LessonLocation.toLowerCase().includes(query)
+                    );
+                },
             }
         });
     </script>
