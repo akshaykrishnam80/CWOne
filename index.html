@@ -68,8 +68,13 @@
                 <div class="row">
                     <div class="col-md-3 mt-3" v-for="lesson in sortedLessons" :key="lesson.id">
                         <img :src="lesson.LessonImg" alt="Lesson Image" style="width: 50px; height: 50px;">
-                        <p>{{ lesson.LessonName }} <br> <b>Price:</b> £{{ lesson.LessonPrice }} <br> <b>Space:</b> {{ lesson.LessonSpace }} <br> <b>Location:</b> {{ lesson.LessonLocation }}</p>
-                        <button @click="addToCart(lesson)" class="btn btn-success">Add to Cart</button>
+                        <p>
+                            {{ lesson.LessonName }} <br>
+                            <b>Price:</b> £{{ lesson.LessonPrice }} <br>
+                            <b>Space:</b> {{ lesson.LessonSpace }}
+                            <button @click="addToCart(lesson)" :disabled="lesson.LessonSpace === 0" class="btn btn-success">Add to Cart</button>
+                            
+                        </p>
                     </div>
                 </div>
             </div>
@@ -78,7 +83,9 @@
                 <h3>Shopping Cart</h3>
                 <ul>
                     <li v-for="item in cart" :key="item.id">
-                        {{ item.LessonName }} <br> £{{ item.LessonPrice }}
+                        {{ item.LessonName }} <br> £{{ item.LessonPrice }} <br>
+                        Quantity: {{ item.quantity }}
+                        <button @click="removeFromCart(item)" class="btn btn-danger">Remove</button>
                     </li>
                 </ul>
 
@@ -119,8 +126,28 @@
             },
             methods: {
                 addToCart(lesson) {
-                    this.cart.push(lesson);
-                    this.calculateTotal();
+                    const existingIndex = this.cart.findIndex(item => item.id === lesson.id);
+
+                    if (lesson.LessonSpace > 0) {
+                        if (existingIndex !== -1) {
+                            this.cart[existingIndex].quantity++;
+                        } else {
+                            this.cart.push({ id: lesson.id, LessonName: lesson.LessonName, LessonPrice: lesson.LessonPrice, quantity: 1 });
+                        }
+
+                        this.lessons.find(item => item.id === lesson.id).LessonSpace--;
+
+                        this.calculateTotal();
+                    }
+                },
+                removeFromCart(item) {
+                    const existingIndex = this.cart.findIndex(cartItem => cartItem.id === item.id);
+
+                    if (existingIndex !== -1) {
+                        this.cart.splice(existingIndex, 1);
+                        this.lessons.find(lesson => lesson.id === item.id).LessonSpace += item.quantity;
+                        this.calculateTotal();
+                    }
                 },
                 calculateTotal() {
                     this.total = this.cart.reduce((acc, item) => acc + item.LessonPrice, 0);
